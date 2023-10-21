@@ -23,9 +23,23 @@ jobs:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
+      env:
+        FORCE_COLOR: 0
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
+  securityscan:
+    runs-on: ubuntu-latest
+    name: Run Snyk to check for vulnerabilities
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@master
+    - name: Run Snyk scan
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high
